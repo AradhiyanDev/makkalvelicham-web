@@ -3,3 +3,5 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/makkalve/public_html
     - /bin/cp -R * $DEPLOYPATH
+    - cd $DEPLOYPATH
+    - composer install --no-dev --optimize-autoloader
