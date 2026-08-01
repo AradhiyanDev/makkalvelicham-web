@@ -57,7 +57,6 @@ class CleanDatabaseService
             Setting::forceDelete(except: [
                 'theme',
                 'activated_plugins',
-                'licensed_to',
                 'media_random_hash',
             ]);
         }

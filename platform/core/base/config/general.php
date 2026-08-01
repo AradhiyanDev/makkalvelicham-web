@@ -460,7 +460,6 @@ return [
     'upgrade_php_require_disabled' => env('CMS_UPGRADE_PHP_REQUIRE_DISABLED', false),
     'enabled_cleanup_database' => env('CMS_ENABLED_CLEANUP_DATABASE', false),
     'hide_cleanup_system_menu' => env('CMS_HIDE_CLEANUP_SYSTEM_MENU', false),
-    'hide_activated_license_info' => env('CMS_HIDE_ACTIVATED_LICENSE_INFO', false),
     'google_fonts_url' => env('CMS_GOOGLE_FONTS_URL', 'https://fonts.bunny.net'),
     'google_fonts_enabled' => env('CMS_GOOGLE_FONTS_ENABLED', true),
     'google_fonts_enabled_cache' => env('CMS_GOOGLE_FONTS_ENABLED_CACHE', true),
@@ -475,5 +474,4 @@ return [
     'allowed_iframe_urls' => env('CMS_IFRAME_ALLOWED_URLS', ''),
     'iframe_regex' => env('CMS_IFRAME_FILTER_URL_REGEX', ''),
     'static_ip' => env('CMS_STATIC_IP'),
-    'license_storage_method' => env('CMS_LICENSE_STORAGE_METHOD', 'file'), // 'file' or 'database'
 ];

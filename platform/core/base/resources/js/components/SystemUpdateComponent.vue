@@ -114,7 +114,6 @@ export default {
         firstStepMessage: String,
         lastStep: String,
         isOutdated: Boolean,
-        isActivated: Boolean,
     },
 
     data() {
@@ -153,11 +152,7 @@ export default {
 
     methods: {
         triggerAskToProcessUpdate() {
-            if (this.isActivated) {
-                this.askToProcessUpdate = true
-            } else {
-                $('#system-updater-confirm-modal').modal('show')
-            }
+            this.askToProcessUpdate = true
         },
 
         async performUpdate() {

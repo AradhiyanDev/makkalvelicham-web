@@ -116,15 +116,6 @@ return [
         ],
     ],
 
-    /**
-     * License page.
-     */
-
-    'license' => [
-        'title' => 'Activate License',
-        'skip' => 'Skip for now',
-    ],
-
     'install' => 'Install',
 
     'final' => [

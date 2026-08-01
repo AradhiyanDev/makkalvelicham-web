@@ -10,11 +10,6 @@ return [
         'flag' => 'core.cms',
     ],
     [
-        'name' => 'Manage license',
-        'flag' => 'core.manage.license',
-        'parent_flag' => 'core.system',
-    ],
-    [
         'name' => 'Cronjob',
         'flag' => 'systems.cronjob',
         'parent_flag' => 'core.system',

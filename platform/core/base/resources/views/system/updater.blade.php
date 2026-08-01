@@ -58,20 +58,6 @@
             </x-core::alert>
         @endif
 
-        @if (! $activated)
-            <x-core::alert
-                type="warning"
-                title="You haven't activated your license yet!"
-                :important="true"
-            >
-                <p class="mt-3 mb-0">
-                    We are required to activate your license before doing upgrade.
-                    Please go to <a href="{{ route('settings.general') }}" class="fw-bold text-white">settings</a> page
-                    to activate your license.
-                </p>
-            </x-core::alert>
-        @endif
-
         @if($isOutdated && $latestUpdate)
             <x-core::card class="mb-3">
                 <x-core::card.header>
@@ -105,23 +91,10 @@
                             first-step-message="{{ SystemUpdaterStepEnum::DOWNLOAD()->message() }}"
                             last-step="{{ SystemUpdaterStepEnum::lastStep() }}"
                             :is-outdated="{{ Js::encode($isOutdated) }}"
-                            :is-activated="{{ Js::encode($activated) }}"
                             v-slot="{ performUpdate }"
                         >
                             @if (!$isOutdated)
                                 <h3 class="text-success">{{ __('The system is up-to-date. There are no new versions to update!') }}</h3>
-                            @endif
-
-                            @if (! $activated)
-                                <x-core::modal.action
-                                    id="system-updater-confirm-modal"
-                                    type="warning"
-                                    title="Are you sure?"
-                                    description="Your license has not been activated yet! You might not receive the latest updates."
-                                    submit-button-label="Yes, update it!"
-                                    :submit-button-attrs="['@click' => 'performUpdate']"
-                                    :cancel-button="true"
-                                ></x-core::modal.action>
                             @endif
                         </system-update-component>
 

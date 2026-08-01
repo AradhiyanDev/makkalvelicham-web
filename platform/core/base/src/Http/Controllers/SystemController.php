@@ -96,7 +96,6 @@ class SystemController extends BaseSystemController
 
         $this->pageTitle(trans('core/base::system.updater'));
 
-        $activated = $core->verifyLicense(false, 15);
         $isOutdated = false;
 
         try {
@@ -118,7 +117,6 @@ class SystemController extends BaseSystemController
             'requiredMemoryLimit',
             'maximumExecutionTime',
             'requiredMaximumExecutionTime',
-            'activated',
             'latestUpdate',
             'isOutdated',
             'updateData'
@@ -212,7 +210,7 @@ class SystemController extends BaseSystemController
                     return $this
                         ->httpResponse()
                         ->setMessage(
-                            __('Could not download updated file. Please check your license or your internet network.')
+                            __('Could not download updated file. Please check your internet network.')
                         )
                         ->setError()
                         ->setCode(422);

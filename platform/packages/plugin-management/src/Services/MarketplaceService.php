@@ -2,7 +2,6 @@
 
 namespace Botble\PluginManagement\Services;
 
-use Botble\Base\Exceptions\RequiresLicenseActivatedException;
 use Botble\Base\Supports\Core;
 use Botble\Base\Supports\Zipper;
 use Exception;
@@ -77,17 +76,9 @@ class MarketplaceService
 
     public function beginInstall(string $id, string $name, ?PluginService $pluginService = null): bool|JsonResponse
     {
-        $core = Core::make();
-        $licenseFilePath = $core->getLicenseFilePath();
-
-        if (! File::exists($licenseFilePath)) {
-            throw new RequiresLicenseActivatedException();
-        }
-
         $requestData = [
             'license_url' => $this->licenseUrl,
             'license_api_key' => $this->licenseApiKey,
-            'license_file' => $core->getLicenseFile(),
         ];
 
         // Add plugin purchase code if available
