@@ -1,9 +1,11 @@
 /node_modules
 
 /storage/*.key
+/vendor
 .DS_Store
 Thumbs.db
 /bower_components
+.env
 .env.backup
 /.idea
 /.vscode
