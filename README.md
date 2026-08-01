@@ -151,4 +151,3 @@ For installation problems, check the Botble documentation at:
 https://docs.botble.com/en/getting-started/installation/
 
 Documentation: https://docs.botble.com/
-# makkalvelicham-web

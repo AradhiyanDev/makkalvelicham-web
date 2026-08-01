@@ -18,7 +18,6 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\ProxyTrait;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Turns a PSR-6 cache into a PSR-16 one.
@@ -69,10 +68,6 @@ class Psr16Cache implements CacheInterface, PruneableInterface, ResettableInterf
         };
         self::$packCacheItem ??= \Closure::bind(
             static function (CacheItem $item) {
-                if (!isset($item->metadata[ItemInterface::METADATA_CTIME])) {
-                    return $item->value;
-                }
-
                 $item->newMetadata = $item->metadata;
 
                 return $item->pack();

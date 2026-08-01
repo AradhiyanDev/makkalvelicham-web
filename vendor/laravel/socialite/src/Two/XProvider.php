@@ -35,4 +35,16 @@ class XProvider extends TwitterProvider
 
         return Arr::get(json_decode($response->getBody(), true), 'data');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function mapUserToObject(array $user)
+    {
+        $user = parent::mapUserToObject($user);
+
+        $user->email = $user['confirmed_email'];
+
+        return $user;
+    }
 }

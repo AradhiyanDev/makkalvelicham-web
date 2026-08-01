@@ -81,7 +81,6 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                     $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
-                    $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
                 }
 
                 return $item;
@@ -109,7 +108,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                 $callback = $wrap;
                 $beta = \INF === $beta ? \INF : 0;
             }
-            if ($adapter instanceof CacheInterface && $i !== $this->adapterCount) {
+            if ($adapter instanceof CacheInterface) {
                 $value = $adapter->get($key, $callback, $beta, $metadata);
             } else {
                 $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);

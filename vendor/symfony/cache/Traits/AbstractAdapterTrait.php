@@ -127,10 +127,6 @@ trait AbstractAdapterTrait
                 $this->namespaceVersion = $namespaceVersion;
                 $this->ids = [];
             }
-        } elseif (preg_match('#[^-+.:_A-Za-z0-9]#', $prefix)) {
-            CacheItem::log($this->logger, 'Failed to clear the cache: Namespace-prefix contains invalid characters.', ['cache-adapter' => get_debug_type($this)]);
-
-            return false;
         } else {
             $namespaceToClear = $this->namespace.$prefix;
         }
@@ -292,12 +288,12 @@ trait AbstractAdapterTrait
         $this->ids = [];
     }
 
-    public function __serialize(): array
+    public function __sleep(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __unserialize(array $data): void
+    public function __wakeup(): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
