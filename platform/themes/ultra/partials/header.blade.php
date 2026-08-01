@@ -7,7 +7,7 @@
           name="viewport"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link
-        href="https://fonts.googleapis.com/css2?family={{ urlencode(theme_option('font_heading', 'Arimo')) }}:wght@400;700&family={{ urlencode(theme_option('font_body', 'Roboto')) }}:ital,wght@0,400;0,500;0,700;0,900;1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family={{ urlencode(theme_option('font_heading', 'Arimo')) }}:wght@400;700&family={{ urlencode(theme_option('font_body', 'Roboto')) }}:ital,wght@0,400;0,500;0,700;0,900;1,400&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet" type="text/css">
     <!-- Fonts-->
     <!-- CSS Library-->
@@ -60,13 +60,18 @@
 
 <div class="main-wrap">
     @php
-        $headerStyle = request()->input('header', theme_option('header_style', 'style-1'));
-        $headerStyle = empty($headerStyle) ? 'style-1' : $headerStyle;
+        $headerStyle = request()->input('header', theme_option('header_style', 'makkal'));
+        $headerStyle = empty($headerStyle) ? 'makkal' : $headerStyle;
+        $isMakkalHeader = str_contains($headerStyle, 'makkal');
     @endphp
 
-    {!! Theme::partial('components.sidebar-canvas', ['headerStyle' => $headerStyle]) !!}
+    @if (! $isMakkalHeader)
+        {!! Theme::partial('components.sidebar-canvas', ['headerStyle' => $headerStyle]) !!}
+    @endif
 
     {!! Theme::partial('header.' . $headerStyle) !!}
 
-    {!! Theme::partial('components.search-form') !!}
+    @if (! $isMakkalHeader)
+        {!! Theme::partial('components.search-form') !!}
+    @endif
 

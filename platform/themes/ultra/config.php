@@ -64,6 +64,7 @@ return [
             $theme->asset()->usePath()->add('jquery-ui-css', 'css/vendor/jquery-ui.css');
 
             $theme->asset()->usePath()->add('style', 'css/style.css', [], [], $version);
+            $theme->asset()->usePath()->add('makkal-header-css', 'css/makkal-header.css', [], [], $version);
 
             if (BaseHelper::siteLanguageDirection() == 'rtl') {
                 $theme->asset()->usePath()->add('rtl', 'css/rtl.css', [], [], $version);
@@ -86,6 +87,7 @@ return [
             $theme->asset()->container('footer')->usePath()->add('theia', 'js/vendor/jquery.theia.sticky.js', ['jquery']);
             $theme->asset()->container('footer')->usePath()->add('lazyload', 'js/vendor/lazyload.min.js');
             $theme->asset()->container('footer')->usePath()->add('script', 'js/script.js', ['jquery'], [], $version);
+            $theme->asset()->container('footer')->usePath()->add('makkal-header-js', 'js/makkal-header.js', [], [], $version);
 
             if (function_exists('shortcode')) {
                 $theme->composer(['page', 'post'], function (View $view): void {

@@ -445,13 +445,42 @@ app()->booted(function (): void {
             'attributes' => [
                 'name' => 'header_style',
                 'list' => [
+                    'makkal' => 'Makkal Velicham',
                     'style-1' => 'Style 1',
                     'style-2' => 'Style 2',
                     'style-3' => 'Style 3',
                 ],
-                'value' => 'style-1',
+                'value' => 'makkal',
                 'options' => [
                     'class' => 'form-control',
+                ],
+            ],
+        ])
+        ->setField([
+            'id' => 'weather_city',
+            'section_id' => 'opt-text-subsection-page',
+            'type' => 'text',
+            'label' => __('Weather city (header)'),
+            'attributes' => [
+                'name' => 'weather_city',
+                'value' => 'Chennai',
+                'options' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Chennai',
+                ],
+            ],
+        ])
+        ->setField([
+            'id' => 'weather_temp',
+            'section_id' => 'opt-text-subsection-page',
+            'type' => 'text',
+            'label' => __('Weather temperature (header)'),
+            'attributes' => [
+                'name' => 'weather_temp',
+                'value' => '35°',
+                'options' => [
+                    'class' => 'form-control',
+                    'placeholder' => '35°',
                 ],
             ],
         ])
