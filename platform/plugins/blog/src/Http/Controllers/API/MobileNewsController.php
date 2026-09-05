@@ -7,6 +7,7 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Blog\Http\Resources\MobilePostResource;
 use Botble\Blog\Http\Resources\PostResource;
 use Botble\Blog\Models\Post;
+use Botble\Blog\Services\FeedRankingService;
 use Botble\Comment\Models\Comment;
 use Botble\Slug\Facades\SlugHelper;
 use Illuminate\Http\Request;
@@ -66,6 +67,17 @@ class MobileNewsController extends BaseApiController
             $feed
         );
 
+        // Support category name filter (All, India, Tamil Nadu etc) via FeedRankingService map
+        if ($categoryId && ! is_numeric($categoryId)) {
+            $map = (new FeedRankingService())->categoryMap();
+            $categoryId = $map[$categoryId] ?? $map[ucfirst($categoryId)] ?? null;
+            if ($categoryId === null && strtolower((string) $request->input('category')) !== 'all') {
+                // fallback to search for Technology etc
+                $search = $search ? $search . ' ' . $request->input('category') : $request->input('category');
+                $categoryId = null;
+            }
+        }
+
         $ttl = ($user && $excludeViewed) ? 30 : 60; // shorter for personalized
 
         // Batch preload for N+1 fix - pass via request attributes
@@ -117,6 +129,7 @@ class MobileNewsController extends BaseApiController
                 }
                 // Cursor where
                 if ($cursorId && $cursorCreatedAt) {
+                    $cursorCreatedAt = \Carbon\Carbon::parse($cursorCreatedAt)->format('Y-m-d H:i:s');
                     $query->where(function ($q) use ($cursorCreatedAt, $cursorId, $order) {
                         if ($order === 'desc') {
                             $q->where('created_at', '<', $cursorCreatedAt)->orWhere(function ($qq) use ($cursorCreatedAt, $cursorId) {
@@ -130,7 +143,11 @@ class MobileNewsController extends BaseApiController
                     });
                 }
 
-                $query->orderBy($orderBy, $order)->orderBy('id', $order);
+                if ($feed === 'for_you') {
+                    (new FeedRankingService())->scoreQuery($query, $user?->getKey());
+                } else {
+                    $query->orderBy($orderBy, $order)->orderBy('id', $order);
+                }
 
                 return $query->limit($perPage + 1)->get();
             });
@@ -151,15 +168,14 @@ class MobileNewsController extends BaseApiController
         }
 
         // Page pagination (legacy) with batch preload
-        $paginator = Cache::remember($cacheKey, $ttl, function () use ($perPage, $page, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user) {
+        $paginator = Cache::remember($cacheKey, $ttl, function () use ($perPage, $page, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user, $feed) {
             $query = Post::query()
                 ->select(['id', 'name', 'description', 'image', 'is_featured', 'views', 'author_id', 'author_type', 'status', 'created_at', 'updated_at'])
                 ->where('status', BaseStatusEnum::PUBLISHED)
                 ->with(['categories:id,name', 'slugable', 'author'])
                 ->withCount(['comments' => function ($q) {
                     $q->where('reference_type', Post::class)->where('status', 'published');
-                }])
-                ->orderBy($orderBy, $order)->orderBy('id', $order);
+                }]);
 
             if ($categoryId) {
                 $query->whereHas('categories', fn($q) => $q->where('categories.id', $categoryId));
@@ -179,6 +195,12 @@ class MobileNewsController extends BaseApiController
                 if ($viewedIds) $query->whereNotIn('id', $viewedIds);
             }
 
+            if ($feed === 'for_you') {
+                (new FeedRankingService())->scoreQuery($query, $user?->getKey());
+            } else {
+                $query->orderBy($orderBy, $order)->orderBy('id', $order);
+            }
+
             return $query->paginate($perPage, ['*'], 'page', $page);
         });
 
@@ -195,6 +217,27 @@ class MobileNewsController extends BaseApiController
         return $this->httpResponse()->setData($resource)->setAdditional([
             'meta' => array_merge($paginator->toArray(), ['next_cursor' => $nextCursor, 'has_more' => $hasMore]),
         ])->toApiResponse();
+    }
+
+    /**
+     * Breaking news count since timestamp
+     *
+     * @group Mobile
+     * @queryParam since string ISO8601 timestamp. Example: 2026-09-05T10:00:00Z
+     */
+    public function newCount(Request $request)
+    {
+        $since = $request->input('since');
+        if (! $since) {
+            return $this->httpResponse()->setError()->setCode(422)->setMessage('since param required');
+        }
+        try {
+            $sinceTime = \Carbon\Carbon::parse($since);
+        } catch (\Exception $e) {
+            return $this->httpResponse()->setError()->setCode(422)->setMessage('Invalid since timestamp');
+        }
+        $count = Post::where('status', BaseStatusEnum::PUBLISHED)->where('created_at', '>', $sinceTime)->count();
+        return $this->httpResponse()->setData(['new_count' => $count, 'since' => $sinceTime->toIso8601String()])->toApiResponse();
     }
 
     public function show(string $slug)

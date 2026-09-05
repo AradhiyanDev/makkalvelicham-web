@@ -18,6 +18,7 @@ Route::group([
     Route::get('categories/{slug}', 'CategoryController@findBySlug');
 
     // Mobile optimized - fast cached lightweight
+    Route::get('mobile/news/new-count', 'MobileNewsController@newCount');
     Route::get('mobile/news', 'MobileNewsController@index');
     Route::get('mobile/news/{slug}', 'MobileNewsController@show');
     Route::post('mobile/posts/{id}/view', 'MobileNewsController@incrementView');
