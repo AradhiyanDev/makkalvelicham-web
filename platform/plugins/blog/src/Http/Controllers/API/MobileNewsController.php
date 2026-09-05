@@ -420,7 +420,8 @@ class MobileNewsController extends BaseApiController
         if (! $post) return $this->httpResponse()->setError()->setCode(404)->setMessage('Post not found');
         $perPage = min($request->integer('per_page', 20), 50);
         $cursor = $request->input('cursor');
-        $query = Comment::where('reference_id',$id)->where('reference_type',Post::class)->where('status','published')->where('parent_id',0)->with(['user'])->orderByDesc('id');
+        $parentId = $request->integer('parent_id', 0);
+        $query = Comment::where('reference_id',$id)->where('reference_type',Post::class)->where('status','published')->where('parent_id',$parentId)->with(['user'])->orderByDesc('id');
         if ($cursor) {
             $decoded = json_decode(base64_decode($cursor), true);
             if ($decoded) $query->where('id','<',$decoded['id']);
