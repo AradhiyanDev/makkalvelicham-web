@@ -440,11 +440,12 @@ class MobileNewsController extends BaseApiController
 
             $postId = $ev['post_id'];
             $type = $ev['event_type'];
+            $occurredAt = \Carbon\Carbon::parse($ev['occurred_at'])->format('Y-m-d H:i:s');
             if (in_array($type, ['viewed','view'])) {
                 $existing = $user ? DB::table('user_post_views')->where(['user_id'=>$user->getKey(),'post_id'=>$postId])->first() : null;
                 if ($type === 'view') {
                     if (! $existing) {
-                        DB::table('user_post_views')->insert(['user_id'=>$user->getKey(),'post_id'=>$postId,'status'=>'view','ip_address'=>$request->ip(),'created_at'=>$ev['occurred_at'],'updated_at'=>now()]);
+                        DB::table('user_post_views')->insert(['user_id'=>$user->getKey(),'post_id'=>$postId,'status'=>'view','ip_address'=>$request->ip(),'created_at'=>$occurredAt,'updated_at'=>now()]);
                         Post::where('id',$postId)->increment('views');
                     } elseif ($existing->status === 'viewed') {
                         DB::table('user_post_views')->where(['user_id'=>$user->getKey(),'post_id'=>$postId])->update(['status'=>'view','updated_at'=>now()]);
@@ -452,7 +453,7 @@ class MobileNewsController extends BaseApiController
                     }
                 } else { // viewed
                     if (! $existing) {
-                        DB::table('user_post_views')->insert(['user_id'=>$user->getKey(),'post_id'=>$postId,'status'=>'viewed','ip_address'=>$request->ip(),'created_at'=>$ev['occurred_at'],'updated_at'=>now()]);
+                        DB::table('user_post_views')->insert(['user_id'=>$user->getKey(),'post_id'=>$postId,'status'=>'viewed','ip_address'=>$request->ip(),'created_at'=>$occurredAt,'updated_at'=>now()]);
                     }
                 }
             } elseif (in_array($type, ['like','unlike'])) {
