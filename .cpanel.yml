@@ -3,4 +3,5 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/makkalve/public_html
     - /bin/cp -R * $DEPLOYPATH
+    - /opt/alt/php84/usr/bin/php $DEPLOYPATH/artisan migrate --force
   

@@ -20,4 +20,10 @@ Route::group([
     // Mobile optimized - fast cached lightweight
     Route::get('mobile/news', 'MobileNewsController@index');
     Route::get('mobile/news/{slug}', 'MobileNewsController@show');
+    Route::post('mobile/posts/{id}/view', 'MobileNewsController@incrementView');
+    Route::post('mobile/posts/{id}/viewed', 'MobileNewsController@markViewed')->middleware('auth:sanctum');
+    Route::post('mobile/posts/{id}/like', 'MobileNewsController@toggleLike')->middleware('auth:sanctum');
+    Route::get('mobile/posts/liked', 'MobileNewsController@likedPosts')->middleware('auth:sanctum');
+    Route::get('mobile/posts/{id}/comments', 'MobileNewsController@comments');
+    Route::post('mobile/posts/{id}/comments', 'MobileNewsController@storeComment')->middleware('auth:sanctum');
 });
