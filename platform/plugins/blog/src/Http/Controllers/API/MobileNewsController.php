@@ -100,7 +100,7 @@ class MobileNewsController extends BaseApiController
             $cursorId = $decoded['id'] ?? null;
             $cursorCreatedAt = $decoded['created_at'] ?? null;
 
-            $data = Cache::remember($cacheKey, $ttl, function () use ($perPage, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user, $cursorId, $cursorCreatedAt) {
+            $data = Cache::remember($cacheKey, $ttl, function () use ($perPage, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user, $cursorId, $cursorCreatedAt, $feed) {
                 $query = Post::query()
                     ->select(['id', 'name', 'description', 'image', 'is_featured', 'views', 'author_id', 'author_type', 'status', 'created_at', 'updated_at'])
                     ->where('status', BaseStatusEnum::PUBLISHED)
@@ -214,8 +214,12 @@ class MobileNewsController extends BaseApiController
             $nextCursor = base64_encode(json_encode(['id' => $last->id, 'created_at' => $last->created_at->toIso8601String()]));
         }
 
+        // Only add next_cursor/has_more to meta - paginator's meta (current_page, total etc) already provided by ResourceCollection
         return $this->httpResponse()->setData($resource)->setAdditional([
-            'meta' => array_merge($paginator->toArray(), ['next_cursor' => $nextCursor, 'has_more' => $hasMore]),
+            'meta' => [
+                'next_cursor' => $nextCursor,
+                'has_more' => $hasMore,
+            ],
         ])->toApiResponse();
     }
 
