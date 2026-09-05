@@ -397,8 +397,14 @@ class MobileNewsController extends BaseApiController
         if (! $post) return $this->httpResponse()->setError()->setCode(404)->setMessage('Post not found');
         $validator = Validator::make($request->all(), [
             'comment' => ['required','string','max:1000'],
-            'parent_id' => ['nullable','integer','exists:bb_comments,id'],
+            'parent_id' => ['nullable','integer'],
         ]);
+        if ($request->filled('parent_id') && (int) $request->input('parent_id') !== 0) {
+            $exists = Comment::where('id', $request->input('parent_id'))->exists();
+            if (! $exists) {
+                return $this->httpResponse()->setError()->setCode(422)->setMessage('The selected parent id is invalid.');
+            }
+        }
         if ($validator->fails()) return $this->httpResponse()->setError()->setCode(422)->setMessage(implode(' ', $validator->errors()->all()));
         $comment = Comment::create([
             'comment' => $request->input('comment'),
