@@ -3,10 +3,8 @@
 namespace Botble\Blog\Http\Resources;
 
 use Botble\Blog\Models\Post;
-use Botble\Comment\Models\Comment;
 use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Optimized lightweight resource for mobile - minimal payload, no Shortcode compile
@@ -16,21 +14,25 @@ class MobilePostResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $viewedSet = $request->attributes->get('viewedIdsSet');
+        $likedSet = $request->attributes->get('likedIdsSet');
         $user = $request->user();
-        $isLiked = false;
-        $isViewed = false;
-        if ($user) {
-            // Check liked via favorite_posts JSON (ProPosts) or favorite_posts table
-            $fav = $user->favorite_posts ? json_decode($user->favorite_posts, true) : [];
-            $isLiked = in_array($this->id, (array) $fav);
-            // Check viewed via user_post_views
-            $isViewed = DB::table('user_post_views')->where('user_id', $user->getKey())->where('post_id', $this->id)->exists();
-        }
 
-        $commentsCount = Comment::where('reference_id', $this->id)
-            ->where('reference_type', Post::class)
-            ->where('status', 'published')
-            ->count();
+        if ($viewedSet !== null && $likedSet !== null) {
+            $isLiked = isset($likedSet[$this->id]);
+            $isViewed = isset($viewedSet[$this->id]);
+            $commentsCount = $this->comments_count ?? 0;
+        } else {
+            // Fallback for direct calls (detail, likedPosts)
+            $isLiked = false;
+            $isViewed = false;
+            if ($user) {
+                $fav = $user->favorite_posts ? json_decode($user->favorite_posts, true) : [];
+                $isLiked = in_array($this->id, (array) $fav);
+                $isViewed = \Illuminate\Support\Facades\DB::table('user_post_views')->where('user_id', $user->getKey())->where('post_id', $this->id)->exists();
+            }
+            $commentsCount = \Botble\Comment\Models\Comment::where('reference_id', $this->id)->where('reference_type', \Botble\Blog\Models\Post::class)->where('status', 'published')->count();
+        }
 
         return [
             'id' => $this->id,

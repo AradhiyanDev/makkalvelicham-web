@@ -26,4 +26,5 @@ Route::group([
     Route::get('mobile/posts/liked', 'MobileNewsController@likedPosts')->middleware('auth:sanctum');
     Route::get('mobile/posts/{id}/comments', 'MobileNewsController@comments');
     Route::post('mobile/posts/{id}/comments', 'MobileNewsController@storeComment')->middleware('auth:sanctum');
+    Route::post('mobile/events/batch', 'MobileNewsController@syncEvents')->middleware('auth:sanctum');
 });
