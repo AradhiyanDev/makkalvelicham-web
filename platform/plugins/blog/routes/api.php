@@ -16,4 +16,8 @@ Route::group([
     Route::get('posts/{slug}', 'PostController@findBySlug');
     Route::get('categories/filters', 'CategoryController@getFilters');
     Route::get('categories/{slug}', 'CategoryController@findBySlug');
+
+    // Mobile optimized - fast cached lightweight
+    Route::get('mobile/news', 'MobileNewsController@index');
+    Route::get('mobile/news/{slug}', 'MobileNewsController@show');
 });
