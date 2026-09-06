@@ -103,6 +103,9 @@ class MobileNewsController extends BaseApiController
             $data = Cache::remember($cacheKey, $ttl, function () use ($perPage, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user, $cursorId, $cursorCreatedAt, $feed) {
                 $query = Post::query()
                     ->select(['id', 'name', 'description', 'image', 'is_featured', 'views', 'author_id', 'author_type', 'status', 'created_at', 'updated_at'])
+                    ->selectSub(function ($q) {
+                        $q->from('likes')->selectRaw('COUNT(*)')->whereColumn('likes.post_id', 'posts.id');
+                    }, 'likes_count')
                     ->where('status', BaseStatusEnum::PUBLISHED)
                     ->with(['categories:id,name', 'slugable', 'author'])
                     ->withCount(['comments' => function ($q) {
@@ -171,6 +174,9 @@ class MobileNewsController extends BaseApiController
         $paginator = Cache::remember($cacheKey, $ttl, function () use ($perPage, $page, $categoryId, $featured, $search, $orderBy, $order, $exclude, $excludeViewed, $user, $feed) {
             $query = Post::query()
                 ->select(['id', 'name', 'description', 'image', 'is_featured', 'views', 'author_id', 'author_type', 'status', 'created_at', 'updated_at'])
+                ->selectSub(function ($q) {
+                    $q->from('likes')->selectRaw('COUNT(*)')->whereColumn('likes.post_id', 'posts.id');
+                }, 'likes_count')
                 ->where('status', BaseStatusEnum::PUBLISHED)
                 ->with(['categories:id,name', 'slugable', 'author'])
                 ->withCount(['comments' => function ($q) {
@@ -340,7 +346,9 @@ class MobileNewsController extends BaseApiController
         }
         if (empty($ids)) return $this->httpResponse()->setData(MobilePostResource::collection(collect([])))->toApiResponse();
 
-        $query = Post::whereIn('id', $ids)->where('status', BaseStatusEnum::PUBLISHED)->with(['categories','slugable','author'])->withCount(['comments' => fn($q) => $q->where('reference_type', Post::class)->where('status','published')]);
+        $query = Post::whereIn('id', $ids)->where('status', BaseStatusEnum::PUBLISHED)->select(['posts.*'])->selectSub(function ($q) {
+            $q->from('likes')->selectRaw('COUNT(*)')->whereColumn('likes.post_id', 'posts.id');
+        }, 'likes_count')->with(['categories','slugable','author'])->withCount(['comments' => fn($q) => $q->where('reference_type', Post::class)->where('status','published')]);
 
         if ($cursor) {
             $decoded = json_decode(base64_decode($cursor), true);

@@ -22,6 +22,7 @@ class MobilePostResource extends JsonResource
             $isLiked = isset($likedSet[$this->id]);
             $isViewed = isset($viewedSet[$this->id]);
             $commentsCount = $this->comments_count ?? 0;
+            $likesCount = $this->likes_count ?? 0;
         } else {
             // Fallback for direct calls (detail, likedPosts)
             $isLiked = false;
@@ -32,6 +33,7 @@ class MobilePostResource extends JsonResource
                 $isViewed = \Illuminate\Support\Facades\DB::table('user_post_views')->where('user_id', $user->getKey())->where('post_id', $this->id)->exists();
             }
             $commentsCount = \Botble\Comment\Models\Comment::where('reference_id', $this->id)->where('reference_type', \Botble\Blog\Models\Post::class)->where('status', 'published')->count();
+            $likesCount = $this->likes_count ?? \Illuminate\Support\Facades\DB::table('likes')->where('post_id', $this->id)->count();
         }
 
         return [
@@ -43,6 +45,7 @@ class MobilePostResource extends JsonResource
             'is_featured' => (bool) $this->is_featured,
             'views' => (int) $this->views,
             'comments_count' => (int) $commentsCount,
+            'likes_count' => (int) $likesCount,
             'is_liked' => $isLiked,
             'is_viewed' => $isViewed,
             'author' => $this->whenLoaded('author', function () {
