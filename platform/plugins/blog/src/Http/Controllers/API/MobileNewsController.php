@@ -486,7 +486,7 @@ class MobileNewsController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'events' => ['required','array','max:50'],
             'events.*.post_id' => ['required','integer','exists:posts,id'],
-            'events.*.event_type' => ['required','string','in:impression,viewed,view,like,unlike,share,bookmark,comment'],
+            'events.*.event_type' => ['required','string','in:impression,engaged_view,deep_read,skip,viewed,view,like,unlike,share,bookmark,comment'],
             'events.*.occurred_at' => ['required','date'],
             'events.*.idempotency_key' => ['required','string','max:64'],
         ]);
@@ -503,6 +503,21 @@ class MobileNewsController extends BaseApiController
             $postId = $ev['post_id'];
             $type = $ev['event_type'];
             $occurredAt = \Carbon\Carbon::parse($ev['occurred_at'])->format('Y-m-d H:i:s');
+            // Store in feed_events for analytics (all event types)
+            try {
+                DB::table('feed_events')->insert([
+                    'user_id' => $user?->getKey(),
+                    'post_id' => $postId,
+                    'event_type' => $type,
+                    'occurred_at' => $occurredAt,
+                    'idempotency_key' => $key,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } catch (\Exception $e) {
+                // duplicate idempotency_key in feed_events -> ignore
+            }
+
             if (in_array($type, ['viewed','view'])) {
                 $existing = $user ? DB::table('user_post_views')->where(['user_id'=>$user->getKey(),'post_id'=>$postId])->first() : null;
                 if ($type === 'view') {
