@@ -7,6 +7,7 @@ use Botble\Base\Forms\FieldOptions\DescriptionFieldOption;
 use Botble\Base\Forms\FieldOptions\IsFeaturedFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
 use Botble\Base\Forms\FieldOptions\NameFieldOption;
+use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
 use Botble\Base\Forms\FieldOptions\RadioFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
 use Botble\Base\Forms\FieldOptions\StatusFieldOption;
@@ -39,6 +40,14 @@ class PostForm extends FormAbstract
                 'is_featured',
                 OnOffField::class,
                 IsFeaturedFieldOption::make()
+            )
+            ->add(
+                'send_push_notification',
+                OnOffField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/blog::posts.form.send_push_notification'))
+                    ->helperText(trans('plugins/blog::posts.form.send_push_notification_helper'))
+                    ->value(false)
             )
             ->add('content', EditorField::class, ContentFieldOption::make()->allowedShortcodes())
             ->add('status', SelectField::class, StatusFieldOption::make())

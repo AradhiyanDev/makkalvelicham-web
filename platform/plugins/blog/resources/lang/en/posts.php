@@ -12,6 +12,8 @@ return [
         'tags_placeholder' => 'Tags',
         'content' => 'Content',
         'is_featured' => 'Feature this post',
+        'send_push_notification' => 'Send push notification',
+        'send_push_notification_helper' => 'Send a push notification to all app users for this post. Overrides featured setting.',
         'note' => 'Note content',
         'format_type' => 'Format',
     ],

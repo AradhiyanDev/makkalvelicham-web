@@ -13,6 +13,7 @@ use Botble\Blog\Services\StoreCategoryService;
 use Botble\Blog\Services\StoreTagService;
 use Botble\Blog\Tables\PostTable;
 use Illuminate\Http\Request;
+use App\Jobs\SendBreakingNewsPush;
 
 class PostController extends BaseController
 {
@@ -50,6 +51,11 @@ class PostController extends BaseController
 
         $categoryService->execute($request, $post);
 
+        // Handle push notification if requested
+        if ($request->boolean('send_push_notification')) {
+            SendBreakingNewsPush::dispatch($post->id);
+        }
+
         return $this
             ->httpResponse()
             ->setPreviousRoute('posts.index')
@@ -82,6 +88,11 @@ class PostController extends BaseController
         $tagService->execute($request, $post);
 
         $categoryService->execute($request, $post);
+
+        // Handle push notification if requested
+        if ($request->boolean('send_push_notification')) {
+            SendBreakingNewsPush::dispatch($post->id);
+        }
 
         return $this
             ->httpResponse()
